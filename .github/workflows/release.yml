@@ -5,12 +5,12 @@ on:
     types: [created]
 
 jobs:
-  buildAndTest:
-    uses: ./.github/workflows/_build_and_test.yml
+  build:
+    uses: ./.github/workflows/_build.yml
   release:
     name: Upload Release Asset
     runs-on: ubuntu-latest
-    needs: buildAndTest
+    needs: build
     steps:
       - uses: actions/download-artifact@v3
         with:

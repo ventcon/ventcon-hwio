@@ -1,12 +1,11 @@
-name: Build and test workflow (to be used by others)
+name: Build workflow (to be used by others)
 
 on:
   workflow_call:
 
 jobs:
 
-  buildAndTest:
-    name: buildAndTest
+  build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -18,9 +17,6 @@ jobs:
 
     - name: Build
       run: go build -o target/ -v ./...
-
-    - name: Test
-      run: go test -v ./...
 
     - uses: actions/upload-artifact@v3
       with:
