@@ -1,0 +1,28 @@
+name: Build and test workflow (to be used by others)
+
+on:
+  workflow_call:
+
+jobs:
+
+  buildAndTest:
+    name: buildAndTest
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.19
+
+    - name: Build
+      run: go build -o target/ -v ./...
+
+    - name: Test
+      run: go test -v ./...
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: build-result
+        path: target/

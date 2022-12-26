@@ -9,21 +9,7 @@ on:
 jobs:
 
   buildAndTest:
-    name: buildAndTest
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: 1.19
-
-    - name: Build
-      run: go build -v ./...
-
-    - name: Test
-      run: go test -v ./...
+    uses: ./.github/workflows/_build_and_test.yml
 
   golangci:
     name: lint

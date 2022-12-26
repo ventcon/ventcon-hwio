@@ -1,0 +1,31 @@
+name: Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  buildAndTest:
+    uses: ./.github/workflows/_build_and_test.yml
+  release:
+    name: Upload Release Asset
+    runs-on: ubuntu-latest
+    needs: buildAndTest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-result
+          path: ./build-result
+      - name: List files
+        run: ls -lR
+      - name: Create zip
+        run: zip build-result.zip build-result/*
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: build-result.zip
+          asset_name: build-result.zip
+          asset_content_type: application/octet-stream
