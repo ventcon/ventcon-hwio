@@ -5,6 +5,8 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  release:
+    types: [created]
 
 jobs:
 
@@ -20,10 +22,15 @@ jobs:
         go-version: 1.19
 
     - name: Build
-      run: go build -v ./...
+      run: go build -o target/ -v ./...
 
     - name: Test
       run: go test -v ./...
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: build-result
+        path: target/
 
   golangci:
     name: lint
