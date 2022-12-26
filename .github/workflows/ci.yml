@@ -9,7 +9,15 @@ on:
 jobs:
 
   build:
+    strategy:
+      matrix:
+        #See https://gist.github.com/lizkes/975ab2d1b5f9d5fdee5d3fa665bcfde6
+        goarch: [amd64, arm, arm64]
+        goos: [linux]
     uses: ./.github/workflows/_build.yml
+    with:
+      goarch: ${{ matrix.goarch }}
+      goos: ${{ matrix.goos }}
 
   test:
     runs-on: ubuntu-latest
