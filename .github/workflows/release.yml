@@ -6,26 +6,39 @@ on:
 
 jobs:
   build:
+    strategy:
+      matrix:
+        #See https://gist.github.com/lizkes/975ab2d1b5f9d5fdee5d3fa665bcfde6
+        goarch: [amd64, arm, arm64]
+        goos: [linux]
     uses: ./.github/workflows/_build.yml
+    with:
+      goarch: ${{ matrix.goarch }}
+      goos: ${{ matrix.goos }}
   release:
     name: Upload Release Asset
     runs-on: ubuntu-latest
     needs: build
+    strategy:
+      matrix:
+        #See https://gist.github.com/lizkes/975ab2d1b5f9d5fdee5d3fa665bcfde6
+        goarch: [amd64, arm, arm64]
+        goos: [linux]
     steps:
       - uses: actions/download-artifact@v3
         with:
-          name: build-result
-          path: ./build-result
+          name: build-result-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: ./build-result-${{ matrix.goos }}-${{ matrix.goarch }}
       - name: List files
         run: ls -lR
       - name: Create zip
-        run: zip build-result.zip build-result/*
+        run: zip build-result-${{ matrix.goos }}-${{ matrix.goarch }}.zip build-result-${{ matrix.goos }}-${{ matrix.goarch }}/*
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: build-result.zip
-          asset_name: build-result.zip
+          asset_path: build-result-${{ matrix.goos }}-${{ matrix.goarch }}.zip
+          asset_name: ${{ github.event.repository.name }}-${{ matrix.goos }}-${{ matrix.goarch }}.zip
           asset_content_type: application/octet-stream

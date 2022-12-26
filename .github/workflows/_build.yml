@@ -2,6 +2,13 @@ name: Build workflow (to be used by others)
 
 on:
   workflow_call:
+    inputs:
+      goos:
+        required: true
+        type: string
+      goarch:
+        required: true
+        type: string
 
 jobs:
 
@@ -16,9 +23,9 @@ jobs:
         go-version: 1.19
 
     - name: Build
-      run: go build -o target/ -v ./...
+      run: GOOS="${{ inputs.goos }}" GOARCH="${{ inputs.goarch }}" go build -o target/ -v ./...
 
     - uses: actions/upload-artifact@v3
       with:
-        name: build-result
+        name: build-result-${{ inputs.goos }}-${{ inputs.goarch }}
         path: target/
