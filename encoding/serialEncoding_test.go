@@ -143,3 +143,26 @@ func TestDecodeResponseBad(t *testing.T) {
 		})
 	}
 }
+
+func TestDecodeResponseNoData(t *testing.T) {
+	encoder, err := NewSerialEncoder()
+	must.NoError(t, err)
+
+	testCases := []struct {
+		input string
+	}{
+		{"\n010lW#?\r"},
+		{"\n001lW#?\r"},
+		{"\n250lW#?\r"},
+		{"\n010sW#?\r"},
+		{"\n001sW#?\r"},
+		{"\n250sW#?\r"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf(`Decode(%s)`, tc.input), func(t *testing.T) {
+			_, err := encoder.Decode(tc.input)
+			test.ErrorContains(t, err, "questionmark")
+		})
+	}
+}

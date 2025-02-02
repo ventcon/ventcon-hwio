@@ -135,7 +135,7 @@ func (serialEncoder SerialEncoder) Decode(data string) (Frame, error) {
 	}
 
 	if strings[3] == "?" {
-		return nil, merry.Errorf("Device returned frame with qustionmark instead of data. Was the function valid?")
+		return nil, merry.Errorf("Device returned frame with questionmark instead of data. Was the function valid?")
 	}
 
 	address, err := parseUint16(strings[1])
