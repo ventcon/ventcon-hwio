@@ -25,7 +25,7 @@ jobs:
     - name: Build
       run: GOOS="${{ inputs.goos }}" GOARCH="${{ inputs.goarch }}" go build -o target/ -v ./...
 
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@v4
       with:
         name: build-result-${{ inputs.goos }}-${{ inputs.goarch }}
         path: target/
