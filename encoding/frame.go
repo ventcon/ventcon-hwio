@@ -27,34 +27,34 @@ const (
 
 // frame represents a single request or response send over the serial interface
 type frame struct {
-	// frameType is the type of the frame
-	frameType FrameType
-	// address is the address of the ventilator this frame is for/from
-	address uint16
-	// function is the function of the ventilator to be read/written or that was read from / written to
-	function uint16
-	// value is the value to be written or the value that was read/written
-	value uint16
+	// FrameType_ is the type of the frame
+	FrameType_ FrameType
+	// Address_ is the Address_ of the ventilator this frame is for/from
+	Address_ uint16
+	// Function_ is the Function_ of the ventilator to be read/written or that was read from / written to
+	Function_ uint16
+	// Value_ is the Value_ to be written or the Value_ that was read/written
+	Value_ uint16
 }
 
 // FrameType gets the type of the frame
 func (f frame) FrameType() FrameType {
-	return f.frameType
+	return f.FrameType_
 }
 
 // Adress gets the address of the ventilator this frame is for/from
 func (f frame) Address() int {
-	return int(f.address)
+	return int(f.Address_)
 }
 
 // Function gets the function of the ventilator to be read/written or that was read from / written to
 func (f frame) Function() int {
-	return int(f.function)
+	return int(f.Function_)
 }
 
 // Value gets the value to be written or the value that was read/written
 func (f frame) Value() int {
-	return int(f.value)
+	return int(f.Value_)
 }
 
 func (f frame) markAsValidFrame() { /*Intentionally empty*/ }
@@ -76,7 +76,7 @@ func NewReadRequest(address int, function int) (Frame, error) {
 	if function < MINIMUM_FUNCTION || function > MAXIMUM_FUNCTION {
 		return nil, merry.Errorf("The function must be between %d and %d (inclusive). It was %d", MINIMUM_FUNCTION, MAXIMUM_FUNCTION, function)
 	}
-	return &frame{frameType: ReadRequest, address: uint16(address), function: uint16(function)}, nil
+	return &frame{FrameType_: ReadRequest, Address_: uint16(address), Function_: uint16(function)}, nil
 }
 
 // NewWriteRequest creates a new Write request
@@ -90,7 +90,7 @@ func NewWriteRequest(address int, function int, value int) (Frame, error) {
 	if value < MINIMUM_VALUE || value > MAXIMUM_VALUE {
 		return nil, merry.Errorf("The value must be between %d and %d (inclusive). It was %d", MINIMUM_VALUE, MAXIMUM_VALUE, value)
 	}
-	return &frame{frameType: WriteRequest, address: uint16(address), function: uint16(function), value: uint16(value)}, nil
+	return &frame{FrameType_: WriteRequest, Address_: uint16(address), Function_: uint16(function), Value_: uint16(value)}, nil
 }
 
 // newResponse creates a new response
@@ -107,5 +107,5 @@ func newReponse(frameType FrameType, address uint16, function uint16, value uint
 	if value < MINIMUM_VALUE || value > MAXIMUM_VALUE {
 		return nil, merry.Errorf("The value must be between %d and %d (inclusive). It was %d", MINIMUM_VALUE, MAXIMUM_VALUE, value)
 	}
-	return &frame{frameType: frameType, address: address, function: function, value: value}, nil
+	return &frame{FrameType_: frameType, Address_: address, Function_: function, Value_: value}, nil
 }

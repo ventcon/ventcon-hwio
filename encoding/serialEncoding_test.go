@@ -11,10 +11,12 @@ import (
 func TestNewSerialEncoder(t *testing.T) {
 	encoder, err := NewSerialEncoder()
 	must.NoError(t, err)
+	inner_encoder, ok := encoder.(*serialEncoder)
+	must.True(t, ok)
 
-	test.NotNil(t, encoder.readTemplate)
-	test.NotNil(t, encoder.writeTemplate)
-	test.NotNil(t, encoder.responseRegex)
+	test.NotNil(t, inner_encoder.readTemplate)
+	test.NotNil(t, inner_encoder.writeTemplate)
+	test.NotNil(t, inner_encoder.responseRegex)
 }
 
 func TestEncodeReadRequest(t *testing.T) {
@@ -140,6 +142,29 @@ func TestDecodeResponseBad(t *testing.T) {
 		t.Run(fmt.Sprintf(`Decode(%s)`, tc.input), func(t *testing.T) {
 			_, err := encoder.Decode(tc.input)
 			test.Error(t, err)
+		})
+	}
+}
+
+func TestDecodeResponseNoData(t *testing.T) {
+	encoder, err := NewSerialEncoder()
+	must.NoError(t, err)
+
+	testCases := []struct {
+		input string
+	}{
+		{"\n010lW#?\r"},
+		{"\n001lW#?\r"},
+		{"\n250lW#?\r"},
+		{"\n010sW#?\r"},
+		{"\n001sW#?\r"},
+		{"\n250sW#?\r"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf(`Decode(%s)`, tc.input), func(t *testing.T) {
+			_, err := encoder.Decode(tc.input)
+			test.ErrorContains(t, err, "questionmark")
 		})
 	}
 }

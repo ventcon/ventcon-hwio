@@ -5,6 +5,9 @@
 *.so
 *.dylib
 
+ventcon-hwio
+ventcon-hwio-arm
+
 # Test binary, built with `go test -c`
 *.test
 
