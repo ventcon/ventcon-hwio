@@ -2,7 +2,6 @@ package serial
 
 import (
 	"bufio"
-	"context"
 	"time"
 
 	"github.com/ansel1/merry/v2"
@@ -15,14 +14,15 @@ import (
 type Serial interface {
 	Open(portName string) error
 	Close() error
-	SendRequest(ctx context.Context, data encoding.Frame) (encoding.Frame, error)
+	SendRequest(data encoding.Frame) (encoding.Frame, error)
 	markAsValidSerial()
 }
 
 type serialCommunicator struct {
-	encoder *encoding.SerialEncoder
-	port    serial.Port
-	reader  *bufio.Reader
+	lowLevelSerialOpener func(portName string, mode *serial.Mode) (serial.Port, error)
+	encoder              encoding.SerialEncoder
+	port                 serial.Port
+	reader               *bufio.Reader
 }
 
 func NewSerial() (Serial, error) {
@@ -30,7 +30,10 @@ func NewSerial() (Serial, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &serialCommunicator{encoder: encoder}, nil
+	return &serialCommunicator{
+		encoder:              encoder,
+		lowLevelSerialOpener: serial.Open,
+	}, nil
 }
 
 func (serialCommunicator *serialCommunicator) Open(portName string) error {
@@ -46,7 +49,7 @@ func (serialCommunicator *serialCommunicator) Open(portName string) error {
 		"serialMode": mode,
 	}).Debug("Opening serial port")
 
-	port, err := serial.Open(portName, mode)
+	port, err := serialCommunicator.lowLevelSerialOpener(portName, mode)
 	if err != nil {
 		return merry.Prependf(err, "Failed to open serial connection for portName %s.", portName)
 	}
@@ -56,7 +59,7 @@ func (serialCommunicator *serialCommunicator) Open(portName string) error {
 		wrappedErr := merry.Prependf(err, "Failed to set the read timeout for portName %s.", portName)
 		closeErr := port.Close()
 		if closeErr != nil {
-			return merry.WithValue("errorOnClose", closeErr).Wrap(wrappedErr, 1)
+			return merry.Prependf(wrappedErr, "Failed to close port: %s; Tried to close port because", closeErr)
 		}
 		return wrappedErr
 	}
@@ -74,17 +77,15 @@ func (serialCommunicator *serialCommunicator) Close() error {
 	return nil
 }
 
-func (serialCommunicator *serialCommunicator) WriteFrame(ctx context.Context, data encoding.Frame) error {
+func (serialCommunicator *serialCommunicator) WriteFrame(data encoding.Frame) error {
+	if serialCommunicator.port == nil {
+		return merry.New("Serial port not yet opened.")
+	}
 	dataStr, err := serialCommunicator.encoder.Encode(data)
 	if err != nil {
 		return err
 	}
 	dataBytes := []byte(dataStr)
-
-	deadline, ok := ctx.Deadline()
-	if ok && deadline.After(time.Now()) {
-		return merry.Prependf(ctx.Err(), "Aborted preparation for sending the following message (did not begin sending): %s", dataStr)
-	}
 
 	log.WithField("frame", data).Trace("Writing frame")
 
@@ -92,20 +93,27 @@ func (serialCommunicator *serialCommunicator) WriteFrame(ctx context.Context, da
 	return merry.Prependf(err, "Failed to send serial message: %s", dataStr)
 }
 
-func (serialCommunicator *serialCommunicator) ReadFrame(ctx context.Context) (encoding.Frame, error) {
+func (serialCommunicator *serialCommunicator) ReadFrame() (encoding.Frame, error) {
+	if serialCommunicator.reader == nil {
+		return nil, merry.New("Serial port not yet opened.")
+	}
+
 	str, err := serialCommunicator.reader.ReadString(encoding.CHAR_CR)
 	if err != nil {
-		return nil, merry.Prependf(err, "Failed to read full frame from serial port", merry.WithValue("readString", str))
+		if len(str) == 0 {
+			return nil, merry.Prepend(err, "Failed to read from serial port")
+		}
+		return nil, merry.Prependf(err, "Failed to read full frame from serial port (Read='%s')", str)
 	}
 	log.WithField("data", encoding.DataWithEscapeChars(str)).Trace("Read full frame")
 	return serialCommunicator.encoder.Decode(str)
 }
 
-func (serialCommunicator *serialCommunicator) SendRequest(ctx context.Context, data encoding.Frame) (encoding.Frame, error) {
-	if err := serialCommunicator.WriteFrame(ctx, data); err != nil {
+func (serialCommunicator *serialCommunicator) SendRequest(data encoding.Frame) (encoding.Frame, error) {
+	if err := serialCommunicator.WriteFrame(data); err != nil {
 		return nil, merry.Prepend(err, "Failed to write request frame")
 	}
-	resp, err := serialCommunicator.ReadFrame(ctx)
+	resp, err := serialCommunicator.ReadFrame()
 	return resp, merry.Prepend(err, "Failed to read response frame")
 }
 

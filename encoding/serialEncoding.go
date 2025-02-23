@@ -46,13 +46,21 @@ const (
 )
 
 // A SerialEncoder can be used to encode and decode frames to and from their string representation
-type SerialEncoder struct {
+type SerialEncoder interface {
+	// Encode encodes the given frame into its string representation
+	Encode(frame Frame) (string, error)
+	// Decode decodes the given frame from its string representation
+	Decode(data string) (Frame, error)
+}
+
+// A SerialEncoder can be used to encode and decode frames to and from their string representation
+type serialEncoder struct {
 	writeTemplate *template.Template
 	readTemplate  *template.Template
 	responseRegex *regexp.Regexp
 }
 
-func (serialEncoder *SerialEncoder) buildTemplates() error {
+func (serialEncoder *serialEncoder) buildTemplates() error {
 	tmpl, err := template.New("WriteFrame").Parse(TEMPLATE_WRITE)
 	if err != nil {
 		return merry.Prepend(err, "Failed building WriteFrame template")
@@ -68,7 +76,7 @@ func (serialEncoder *SerialEncoder) buildTemplates() error {
 	return nil
 }
 
-func (serialEncoder *SerialEncoder) buildRegex() error {
+func (serialEncoder *serialEncoder) buildRegex() error {
 	re, err := regexp.Compile(REGEX_RESPONSE)
 	if err != nil {
 		return merry.Prepend(err, "Failed building Response regex")
@@ -79,8 +87,8 @@ func (serialEncoder *SerialEncoder) buildRegex() error {
 }
 
 // NewSerialEncoder initializes and returns a new SerialEncoder
-func NewSerialEncoder() (*SerialEncoder, error) {
-	serialEncoder := &SerialEncoder{}
+func NewSerialEncoder() (SerialEncoder, error) {
+	serialEncoder := &serialEncoder{}
 	if err := serialEncoder.buildTemplates(); err != nil {
 		return nil, err
 	}
@@ -91,7 +99,7 @@ func NewSerialEncoder() (*SerialEncoder, error) {
 }
 
 // Encode encodes the given frame into its string representation
-func (serialEncoder SerialEncoder) Encode(frame Frame) (string, error) {
+func (serialEncoder *serialEncoder) Encode(frame Frame) (string, error) {
 	var buf bytes.Buffer
 
 	log.WithField("frame", frame).Trace("Encoding frame")
@@ -121,7 +129,7 @@ func parseUint16(data string) (uint16, error) {
 }
 
 // Decode decodes the given frame from its string representation
-func (serialEncoder SerialEncoder) Decode(data string) (Frame, error) {
+func (serialEncoder *serialEncoder) Decode(data string) (Frame, error) {
 	log.WithField("data", DataWithEscapeChars(data)).Trace("Decoding frame")
 
 	strings := serialEncoder.responseRegex.FindStringSubmatch(data)
@@ -135,7 +143,7 @@ func (serialEncoder SerialEncoder) Decode(data string) (Frame, error) {
 	}
 
 	if strings[3] == "?" {
-		return nil, merry.Errorf("Device returned frame with questionmark instead of data. Was the function valid?")
+		return nil, merry.New("Device returned frame with questionmark instead of data. Was the function valid?")
 	}
 
 	address, err := parseUint16(strings[1])

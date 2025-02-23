@@ -11,10 +11,12 @@ import (
 func TestNewSerialEncoder(t *testing.T) {
 	encoder, err := NewSerialEncoder()
 	must.NoError(t, err)
+	inner_encoder, ok := encoder.(*serialEncoder)
+	must.True(t, ok)
 
-	test.NotNil(t, encoder.readTemplate)
-	test.NotNil(t, encoder.writeTemplate)
-	test.NotNil(t, encoder.responseRegex)
+	test.NotNil(t, inner_encoder.readTemplate)
+	test.NotNil(t, inner_encoder.writeTemplate)
+	test.NotNil(t, inner_encoder.responseRegex)
 }
 
 func TestEncodeReadRequest(t *testing.T) {
