@@ -1,6 +1,6 @@
 module github.com/ventcon/ventcon-hwio
 
-go 1.19
+go 1.24
 
 require (
 	github.com/ansel1/merry/v2 v2.2.1
