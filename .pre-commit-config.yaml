@@ -1,0 +1,22 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v5.0.0
+  hooks:
+  - id: check-json
+  - id: check-yaml
+  - id: end-of-file-fixer
+  - id: trailing-whitespace
+  - id: check-shebang-scripts-are-executable
+  - id: check-symlinks
+  - id: destroyed-symlinks
+  - id: no-commit-to-branch
+    args: [--branch, main]
+- repo: https://github.com/neumantm/pre-commit-golang
+  rev: v0.5.2
+  hooks:
+    - id: go-fmt
+    - id: go-vet
+    - id: golangci-lint
+    - id: go-unit-tests
+    - id: go-build
+    - id: go-mod-tidy
