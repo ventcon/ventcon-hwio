@@ -53,7 +53,9 @@ jobs:
           go-version: 1.24
       - uses: actions/checkout@v4
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.64
 
   check-mod:
     name: Check go.mod and go.sum
