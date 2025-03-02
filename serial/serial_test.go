@@ -14,6 +14,7 @@ import (
 const PORT_NAME = "/my/port/name"
 
 type testSerialPort struct {
+	serial.Port
 	failOnSetReadTimeout bool
 	failOnClose          bool
 	failOnWrite          bool
@@ -26,7 +27,6 @@ type testSerialPort struct {
 	readOffset           int
 }
 
-func (sp *testSerialPort) SetMode(mode *serial.Mode) error { return fmt.Errorf("Not implemented") }
 func (sp *testSerialPort) Read(p []byte) (n int, err error) {
 	if sp.failOnRead {
 		return 0, fmt.Errorf("Some Read failure")
@@ -58,13 +58,6 @@ func (sp *testSerialPort) Write(p []byte) (n int, err error) {
 	sp.written = newWritten
 
 	return toWrite, nil
-}
-func (sp *testSerialPort) ResetInputBuffer() error  { return fmt.Errorf("Not implemented") }
-func (sp *testSerialPort) ResetOutputBuffer() error { return fmt.Errorf("Not implemented") }
-func (sp *testSerialPort) SetDTR(dtr bool) error    { return fmt.Errorf("Not implemented") }
-func (sp *testSerialPort) SetRTS(rts bool) error    { return fmt.Errorf("Not implemented") }
-func (sp *testSerialPort) GetModemStatusBits() (*serial.ModemStatusBits, error) {
-	return nil, fmt.Errorf("Not implemented")
 }
 func (sp *testSerialPort) SetReadTimeout(t time.Duration) error {
 	sp.readTimeout = t
