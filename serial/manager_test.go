@@ -3,6 +3,7 @@ package serial
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/shoenig/test"
 	"github.com/shoenig/test/must"
@@ -107,6 +108,7 @@ func TestRunClosingRequestChannel(t *testing.T) {
 	must.NoError(t, err)
 
 	close(requestChannel)
+	time.Sleep(10 * time.Millisecond) // Wait for the serial manager to process the close
 
 	test.False(t, serial.wasClosed)
 	test.False(t, isChannelClose(serialManager.stop))
