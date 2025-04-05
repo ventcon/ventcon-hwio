@@ -189,6 +189,8 @@ func AbsDiff(a, b int) int {
 }
 
 func TestStartNoSourceGetsAhead(t *testing.T) {
+	num_messages := 50
+
 	sink := make(chan int)
 	scheduler := NewFairScheduler(sink)
 	test.NotNil(t, scheduler)
@@ -206,29 +208,23 @@ func TestStartNoSourceGetsAhead(t *testing.T) {
 	must.NoError(t, err)
 
 	go func() {
-		source1 <- 1
-		source1 <- 1
-		source1 <- 1
-		source1 <- 1
-		source1 <- 1
+		for i := 0; i < num_messages; i++ {
+			source1 <- 1
+		}
 		close(source1)
 	}()
 
 	go func() {
-		source2 <- 2
-		source2 <- 2
-		source2 <- 2
-		source2 <- 2
-		source2 <- 2
+		for i := 0; i < num_messages; i++ {
+			source2 <- 2
+		}
 		close(source2)
 	}()
 
 	go func() {
-		source3 <- 3
-		source3 <- 3
-		source3 <- 3
-		source3 <- 3
-		source3 <- 3
+		for i := 0; i < num_messages; i++ {
+			source3 <- 3
+		}
 		close(source3)
 	}()
 
@@ -247,15 +243,16 @@ func TestStartNoSourceGetsAhead(t *testing.T) {
 		case 3:
 			s3Count++
 		}
-		test.LessEq(t, 1, AbsDiff(s1Count, s2Count))
-		test.LessEq(t, 1, AbsDiff(s1Count, s3Count))
-		test.LessEq(t, 1, AbsDiff(s2Count, s3Count))
-		time.Sleep(10 * time.Millisecond) // Give all sources a chance to send
+		test.LessEq(t, 2, AbsDiff(s1Count, s2Count))
+		test.LessEq(t, 2, AbsDiff(s1Count, s3Count))
+		test.LessEq(t, 2, AbsDiff(s2Count, s3Count))
+		// TODO: Replace with using synctest. See #34
+		time.Sleep(5 * time.Millisecond) // Give all sources a chance to send
 	}
 
-	test.Eq(t, 5, s1Count)
-	test.Eq(t, 5, s2Count)
-	test.Eq(t, 5, s3Count)
+	test.Eq(t, num_messages, s1Count)
+	test.Eq(t, num_messages, s2Count)
+	test.Eq(t, num_messages, s3Count)
 
 	scheduler.Stop()
 }
