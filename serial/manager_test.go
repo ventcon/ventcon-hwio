@@ -242,10 +242,10 @@ func TestRun(t *testing.T) {
 					if request.hasResponseChannel {
 						resp := responses[i]
 						if request.expectErr {
-							test.ErrorContains(t, resp.err, "Some sending failure")
+							test.ErrorContains(t, resp.Err, "Some sending failure")
 						} else {
-							must.NoError(t, resp.err)
-							test.Eq(t, request.request.Data, resp.response)
+							must.NoError(t, resp.Err)
+							test.Eq(t, request.request.Data, resp.Response)
 						}
 					}
 				})
