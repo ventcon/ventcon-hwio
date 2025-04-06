@@ -292,6 +292,16 @@ func TestReadFrameFailOnRead(t *testing.T) {
 	test.Eq(t, 0, testSp.readOffset)
 }
 
+func TestReadFrameNoData(t *testing.T) {
+	testSp := &testSerialPort{}
+	serial := setupWorkingCommunicator(t, testSp, true)
+
+	_, err := serial.ReadFrame()
+
+	test.ErrorIs(t, err, NoDataOnSerialError)
+	test.Eq(t, 0, testSp.readOffset)
+}
+
 func TestReadFrameFailOnReadButStart(t *testing.T) {
 	testSp := &testSerialPort{
 		failOnReadButStart: true,

@@ -7,8 +7,8 @@ import (
 )
 
 type Response struct {
-	response encoding.Frame
-	err      error
+	Response encoding.Frame
+	Err      error
 }
 
 type Request struct {
