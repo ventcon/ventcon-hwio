@@ -2,6 +2,8 @@ package serial
 
 import (
 	"bufio"
+	"errors"
+	"io"
 	"time"
 
 	"github.com/ansel1/merry/v2"
@@ -10,6 +12,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 )
+
+var NoDataOnSerialError = merry.Sentinel("No data on serial")
 
 type Serial interface {
 	Open(portName string) error
@@ -98,10 +102,18 @@ func (serialCommunicator *serialCommunicator) ReadFrame() (encoding.Frame, error
 		return nil, merry.New("Serial port not yet opened.")
 	}
 
+	// The buffered reader implementation tries 100 times to read from the underlying reader
+	// This is not optimal.
+	// TODO: Implement a custom reader that reads until a delimiter is found with none/less retries
 	str, err := serialCommunicator.reader.ReadString(encoding.CHAR_CR)
 	if err != nil {
+		var wrappers []merry.Wrapper
+
 		if len(str) == 0 {
-			return nil, merry.Prepend(err, "Failed to read from serial port")
+			if errors.Is(err, io.ErrNoProgress) {
+				wrappers = append(wrappers, merry.WithCause(NoDataOnSerialError))
+			}
+			return nil, merry.Prepend(err, "Failed to read from serial port", wrappers...)
 		}
 		return nil, merry.Prependf(err, "Failed to read full frame from serial port (Read='%s')", str)
 	}
