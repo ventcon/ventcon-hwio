@@ -168,7 +168,7 @@ func (serialEncoder *serialEncoder) Decode(data string) (Frame, error) {
 		return nil, merry.Errorf("Unknown frame response type: %s", strings[2])
 	}
 
-	frame, err := newReponse(frameType, address, function, value)
+	frame, err := NewResponse(frameType, address, function, value)
 
 	if err == nil {
 		log.WithField("frame", frame).Trace("Succsesfully decoded frame")

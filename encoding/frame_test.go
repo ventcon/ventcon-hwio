@@ -100,61 +100,61 @@ func TestNewWriteRequestBad(t *testing.T) {
 	}
 }
 
-func TestNewReponseWriteGood(t *testing.T) {
+func TestNewResponseWriteGood(t *testing.T) {
 	testCases := testCasesForCombiantionsOfExcept([]int{DEFAULT_ADDRESS, MINIMUM_ADDRESS, MAXIMUM_ADDRESS}, []int{DEFAULT_FUNCTION, MINIMUM_FUNCTION, MAXIMUM_FUNCTION}, []int{DEFAULT_VALUE, MINIMUM_VALUE, MAXIMUM_VALUE}, func(tc frameTestCase) bool {
 		return false
 	})
 
 	for _, tc := range testCases {
-		t.Run(fmt.Sprintf(`newResponse(WriteResponse, %d, %d, %d)`, tc.address, tc.function, tc.value), func(t *testing.T) {
-			frame, err := newReponse(WriteResponse, uint16(tc.address), uint16(tc.function), uint16(tc.value))
+		t.Run(fmt.Sprintf(`NewResponse(WriteResponse, %d, %d, %d)`, tc.address, tc.function, tc.value), func(t *testing.T) {
+			frame, err := NewResponse(WriteResponse, uint16(tc.address), uint16(tc.function), uint16(tc.value))
 			must.NoError(t, err)
 			testFrameValues(t, frame, tc.address, WriteResponse, tc.function, tc.value)
 		})
 	}
 }
 
-func TestNewReponseReadGood(t *testing.T) {
+func TestNewResponseReadGood(t *testing.T) {
 	testCases := testCasesForCombiantionsOfExcept([]int{DEFAULT_ADDRESS, MINIMUM_ADDRESS, MAXIMUM_ADDRESS}, []int{DEFAULT_FUNCTION, MINIMUM_FUNCTION, MAXIMUM_FUNCTION}, []int{DEFAULT_VALUE, MINIMUM_VALUE, MAXIMUM_VALUE}, func(tc frameTestCase) bool {
 		return false
 	})
 
 	for _, tc := range testCases {
-		t.Run(fmt.Sprintf(`newResponse(ReadResponse, %d, %d, %d)`, tc.address, tc.function, tc.value), func(t *testing.T) {
-			frame, err := newReponse(ReadResponse, uint16(tc.address), uint16(tc.function), uint16(tc.value))
+		t.Run(fmt.Sprintf(`NewResponse(ReadResponse, %d, %d, %d)`, tc.address, tc.function, tc.value), func(t *testing.T) {
+			frame, err := NewResponse(ReadResponse, uint16(tc.address), uint16(tc.function), uint16(tc.value))
 			must.NoError(t, err)
 			testFrameValues(t, frame, tc.address, ReadResponse, tc.function, tc.value)
 		})
 	}
 }
 
-func TestNewReponseWriteBad(t *testing.T) {
+func TestNewResponseWriteBad(t *testing.T) {
 	testCases := testCasesForCombiantionsOfExcept([]int{DEFAULT_ADDRESS, MINIMUM_ADDRESS - 1, MAXIMUM_ADDRESS + 1}, []int{DEFAULT_FUNCTION, MINIMUM_FUNCTION - 1, MAXIMUM_FUNCTION + 1}, []int{DEFAULT_VALUE, MINIMUM_VALUE - 1, MAXIMUM_VALUE + 1}, func(tc frameTestCase) bool {
 		return tc.address == DEFAULT_ADDRESS && tc.function == DEFAULT_FUNCTION && tc.value == DEFAULT_VALUE
 	})
 
 	for _, tc := range testCases {
-		t.Run(fmt.Sprintf(`newResponse(WriteResponse, %d, %d, %d)`, tc.address, tc.function, tc.value), func(t *testing.T) {
-			_, err := newReponse(WriteResponse, uint16(tc.address), uint16(tc.function), uint16(tc.value))
+		t.Run(fmt.Sprintf(`NewResponse(WriteResponse, %d, %d, %d)`, tc.address, tc.function, tc.value), func(t *testing.T) {
+			_, err := NewResponse(WriteResponse, uint16(tc.address), uint16(tc.function), uint16(tc.value))
 			test.Error(t, err)
 		})
 	}
 }
 
-func TestNewReponseReadBad(t *testing.T) {
+func TestNewResponseReadBad(t *testing.T) {
 	testCases := testCasesForCombiantionsOfExcept([]int{DEFAULT_ADDRESS, MINIMUM_ADDRESS - 1, MAXIMUM_ADDRESS + 1}, []int{DEFAULT_FUNCTION, MINIMUM_FUNCTION - 1, MAXIMUM_FUNCTION + 1}, []int{DEFAULT_VALUE, MINIMUM_VALUE - 1, MAXIMUM_VALUE + 1}, func(tc frameTestCase) bool {
 		return tc.address == DEFAULT_ADDRESS && tc.function == DEFAULT_FUNCTION && tc.value == DEFAULT_VALUE
 	})
 
 	for _, tc := range testCases {
-		t.Run(fmt.Sprintf(`newResponse(ReadResponse, %d, %d, %d)`, tc.address, tc.function, tc.value), func(t *testing.T) {
-			_, err := newReponse(ReadResponse, uint16(tc.address), uint16(tc.function), uint16(tc.value))
+		t.Run(fmt.Sprintf(`NewResponse(ReadResponse, %d, %d, %d)`, tc.address, tc.function, tc.value), func(t *testing.T) {
+			_, err := NewResponse(ReadResponse, uint16(tc.address), uint16(tc.function), uint16(tc.value))
 			test.Error(t, err)
 		})
 	}
 }
 
-func TestNewReponseBadFrameType(t *testing.T) {
+func TestNewResponseBadFrameType(t *testing.T) {
 	testCases := []struct {
 		frameType FrameType
 	}{
@@ -164,8 +164,8 @@ func TestNewReponseBadFrameType(t *testing.T) {
 		{""},
 	}
 	for _, tc := range testCases {
-		t.Run(fmt.Sprintf(`newResponse(%s, 100, 200, 300)`, tc.frameType), func(t *testing.T) {
-			_, err := newReponse(tc.frameType, uint16(100), uint16(200), uint16(300))
+		t.Run(fmt.Sprintf(`NewResponse(%s, 100, 200, 300)`, tc.frameType), func(t *testing.T) {
+			_, err := NewResponse(tc.frameType, uint16(100), uint16(200), uint16(300))
 			test.Error(t, err)
 		})
 	}
