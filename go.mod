@@ -5,6 +5,7 @@ go 1.24
 require (
 	github.com/ansel1/merry/v2 v2.2.1
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/nats-io/nats.go v1.41.0
 	github.com/neumantm/logtrace v1.0.0
 	github.com/shoenig/test v1.12.1
 	github.com/sirupsen/logrus v1.9.3
@@ -15,5 +16,10 @@ require (
 require (
 	github.com/creack/goselect v0.1.2 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
+	github.com/klauspost/compress v1.18.0 // indirect
+	github.com/nats-io/nkeys v0.4.9 // indirect
+	github.com/nats-io/nuid v1.0.1 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 )
