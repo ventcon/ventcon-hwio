@@ -8,6 +8,7 @@ require (
 	github.com/neumantm/logtrace v1.0.0
 	github.com/shoenig/test v1.12.1
 	github.com/sirupsen/logrus v1.9.3
+	github.com/ventcon/ventcon-msgspec v1.0.0
 	go.bug.st/serial v1.6.4
 )
 

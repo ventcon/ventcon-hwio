@@ -93,8 +93,8 @@ func NewWriteRequest(address int, function int, value int) (Frame, error) {
 	return &frame{FrameType_: WriteRequest, Address_: uint16(address), Function_: uint16(function), Value_: uint16(value)}, nil
 }
 
-// newResponse creates a new response
-func newReponse(frameType FrameType, address uint16, function uint16, value uint16) (*frame, error) {
+// NewResponse creates a new response
+func NewResponse(frameType FrameType, address uint16, function uint16, value uint16) (*frame, error) {
 	if !(frameType == ReadResponse || frameType == WriteResponse) {
 		return nil, merry.Errorf("Invalid frame type for a response: %s", frameType)
 	}
