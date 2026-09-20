@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"io"
 	"strings"
+	"time"
 
 	"github.com/kelseyhightower/envconfig"
 	log "github.com/sirupsen/logrus"
+	"github.com/ventcon/ventcon-hwio/nats"
 )
 
 // PREFIX is prepended the the configuration options of this project
@@ -19,7 +21,11 @@ const PREFIX = "VENTCON_HWIO"
 // See github.com/kelseyhightower/envconfig for the format
 // It can also include subconfig of specific components.
 type Config struct {
-	LogLevel log.Level `default:"Info" split_words:"true" desc:"The log level (panic, fatal, error, warn, info, debug, trace)"`
+	LogLevel log.Level       `default:"Info" split_words:"true" desc:"The log level (panic, fatal, error, warn, info, debug, trace)"`
+	PortName string          `default:"/dev/ttyUSB0" split_words:"true" desc:"The serial port name to use"`
+	Address  int             `split_words:"true" desc:"The address of the ventilator to work with"`
+	Period   time.Duration   `default:"5s" split_words:"true" desc:"The period to wait between two status updates"`
+	Nats     nats.NatsConfig `split_words:"true" desc:"The NATS broker configuration"`
 }
 
 // LogLevel is a type alias used for the LogLevel config decoded

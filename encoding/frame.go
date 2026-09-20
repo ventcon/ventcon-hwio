@@ -95,7 +95,7 @@ func NewWriteRequest(address int, function int, value int) (Frame, error) {
 
 // NewResponse creates a new response
 func NewResponse(frameType FrameType, address uint16, function uint16, value uint16) (*frame, error) {
-	if !(frameType == ReadResponse || frameType == WriteResponse) {
+	if frameType != ReadResponse && frameType != WriteResponse {
 		return nil, merry.Errorf("Invalid frame type for a response: %s", frameType)
 	}
 	if address < MINIMUM_ADDRESS || address > MAXIMUM_ADDRESS {
