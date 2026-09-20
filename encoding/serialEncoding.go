@@ -160,11 +160,12 @@ func (serialEncoder *serialEncoder) Decode(data string) (Frame, error) {
 	}
 
 	var frameType FrameType
-	if strings[2] == CHAR_S_READ {
+	switch strings[2] {
+	case CHAR_S_READ:
 		frameType = ReadResponse
-	} else if strings[2] == CHAR_S_WRITE {
+	case CHAR_S_WRITE:
 		frameType = WriteResponse
-	} else {
+	default:
 		return nil, merry.Errorf("Unknown frame response type: %s", strings[2])
 	}
 
